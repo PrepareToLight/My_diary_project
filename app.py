@@ -1,37 +1,5 @@
 from rect import *
 
-Menu= ["Select option: ", "a) Add new entry", "b) View entrys", "c) Exit", "d) Show menu", "Your selection: "]
-menu = '''Select option: 
-a) Add new entry
-b) View entrys
-c) Exit
-d) Show menu
-
-Your selection: '''
-entry_list = []
-
-def dairy():
-    run, show = True, True
-    while run:
-
-        if show == True:
-            print(menu)
-            show = False
-        else:
-            print("Your selection: (for menu press d)")
-
-        choice = input()
-        if choice.lower() == "a":
-            print("Add new entry: ")
-            new_entry = input()
-            entry_list.append(new_entry)
-        elif choice.lower() == "b":
-            print(entry_list)
-        elif choice.lower() == "c":
-            run = False
-        elif choice.lower() == "d":
-            show = True
-
 pg.init()
 
 x,y = -100, -100
@@ -46,6 +14,11 @@ while run:
     img2, rect2 = draw_text(screen, Menu[2], (50, 101))
     img3, rect3 = draw_text(screen, Menu[3], (50, 151))
 
+    if run_a:
+        img4, rect4 = draw_text(screen, "Enter your text here: ", (150, 200))
+        img5, rect5 = draw_text(screen, "Exit editing mode ", (50, 500))
+        if cursor.colliderect(rect5):
+            pg.draw.rect(screen, (255,255,0), rect5, 1)
 
     #those lines ables us to terminate the program and some other functionality
     for event in pg.event.get():
@@ -55,11 +28,22 @@ while run:
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 run = False
+            if run_a:
+                if event.type == pg.K_BACKSPACE:
+                    if len(text) > 0:
+                        text = text[:-1]
+
         if event.type == pg.MOUSEMOTION:
             x, y = event.pos
         if event.type == pg.MOUSEBUTTONDOWN:
             if cursor.colliderect(rect3):
                 run = False
+            if run_a:
+                if cursor.colliderect(rect5):
+                    run_a = False
+            if cursor.colliderect(rect1):
+                run_a = True
+                
         
     if cursor.colliderect(rect3):
         pg.draw.rect(screen, (255,255,0), rect3, 1)
