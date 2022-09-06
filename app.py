@@ -15,8 +15,8 @@ while run:
     img3, rect3 = draw_text(screen, Menu[3], (50, 151))
 
     if run_a:
-        img4, rect4 = draw_text(screen, "Enter your text here: ", (150, 200))
-        img5, rect5 = draw_text(screen, "Exit editing mode ", (50, 500))
+        img4, rect4 = draw_text(screen, text, (0, 200))
+        img5, rect5 = draw_text(screen, "Exit editing mode without saving", (50, 500))
         if cursor.colliderect(rect5):
             pg.draw.rect(screen, (255,255,0), rect5, 1)
 
@@ -29,9 +29,15 @@ while run:
             if event.key == pg.K_ESCAPE:
                 run = False
             if run_a:
-                if event.type == pg.K_BACKSPACE:
+                if event.key == pg.K_BACKSPACE: 
                     if len(text) > 0:
                         text = text[:-1]
+                elif event.key == 13:
+                    entry_list.append(text)
+                    text = "Enter your text here"
+                    run_a = False
+                else:
+                    text += event.unicode
 
         if event.type == pg.MOUSEMOTION:
             x, y = event.pos
