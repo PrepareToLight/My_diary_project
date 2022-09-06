@@ -25,7 +25,7 @@ def draw_text(screen, text: str, position: tuple = (0, 0)) -> None:
     return img, rect
 
 #some variables
-Menu= ["Select option: ", "a) Add new entry", "b) View entrys", "c) Exit", "d) Show menu", "Your selection: "]
+Menu= ["Select option: ", "a) Add new entry", "b) View entrys", "c) Exit Dairy", "d) Show menu", "Your selection: "]
 text = "Enter your text here"
 entry_list = []
 
