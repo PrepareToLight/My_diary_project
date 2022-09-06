@@ -7,6 +7,7 @@ background = (0,0,0)
 FPS = 60
 size = width, height = 900, 600
 run = True
+run_a = False
 COLOR = (0,255,0)
 
 screen = pg.display.set_mode(size)
@@ -22,5 +23,10 @@ def draw_text(screen, text: str, position: tuple = (0, 0)) -> None:
     rect.x, rect.y = position
     screen.blit(img, position)
     return img, rect
+
+#some variables
+Menu= ["Select option: ", "a) Add new entry", "b) View entrys", "c) Exit", "d) Show menu", "Your selection: "]
+text = "Enter your text here"
+entry_list = []
 
 
