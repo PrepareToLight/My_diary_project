@@ -13,10 +13,14 @@ screen = pg.display.set_mode(size)
 clock = pg.time.Clock()
 
 
-Font = pg.font.SysFont(None, 24) #none tells us that we dont specify the "font" style
+Font = pg.font.SysFont(None, 50) #none tells us that we dont specify the "font" style
 #it's going to be a defaoult systems font. Secound part is the fontsize
 
 def draw_text(screen, text: str, position: tuple = (0, 0)) -> None:
-    img = Font.render(text, True, (0,255,255))
+    img = Font.render(text, True, (255,255,255))
+    rect = img.get_rect()
+    rect.x, rect.y = position
     screen.blit(img, position)
+    return img, rect
+
 
