@@ -1,4 +1,5 @@
 from rect import *
+from database import *
 
 pg.init()
 
@@ -23,14 +24,18 @@ while run:
         img_1_b = draw_text(screen, "Yours previous entries", (0, 200))
         if len(entry_list) < 1:
             draw_text(screen, "No entries", (50, 250))
+            print(view_entries())
         elif len(entry_list) < 2:
             draw_text(screen, "1. " + entry_list[0], (50, 250))
+            print(view_entries())
         elif len(entry_list) < 5:
             for id,entry in enumerate(entry_list[::-1]):
-                draw_text(screen, entry, (50, 250 + 50*id))
+                draw_text(screen, entry + view_entries()[id]["date"], (50, 250 + 50*id))
+                print(view_entries())
         else:
             for id,entry in enumerate(entry_list[len(entry_list)-1:len(entry_list)-6:-1]):
-                draw_text(screen, entry, (50, 250 + 50*id))
+                draw_text(screen, entry + view_entries()[id]["date"], (50, 250 + 50*id))
+                print(view_entries(), len(view_entries()))
 
 
         img_2_b, rect_2_b = draw_text(screen, "Exit view mode", (50, 500))
@@ -45,13 +50,16 @@ while run:
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_ESCAPE:
                 run = False
+            if event.key == pg.K_a and run_b == False:
+                run_a = True
             if run_a:
                 if event.key == pg.K_BACKSPACE: 
                     if len(text) > 0:
                         text = text[:-1]
-                elif event.key == 13:
+                elif event.key == 13: #Enter
                     if len(text) > 0:
                         entry_list.append(text)
+                        add_entries(text)
                         text = "Click here to start writing or to delete changes"
                         run_a = False
                 else:
