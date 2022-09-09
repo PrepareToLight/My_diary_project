@@ -16,9 +16,26 @@ while run:
 
     if run_a:
         img4, rect4 = draw_text(screen, text, (0, 200))
-        img5, rect5 = draw_text(screen, "Exit editing mode without saving", (50, 500))
+        img5, rect5 = draw_text(screen, "Exit or press Enter to save", (50, 500))
         if cursor.colliderect(rect5):
             pg.draw.rect(screen, (255,255,0), rect5, 1)
+    if run_b:
+        img_1_b = draw_text(screen, "Yours previous entries", (0, 200))
+        if len(entry_list) < 1:
+            draw_text(screen, "No entries", (50, 250))
+        elif len(entry_list) < 2:
+            draw_text(screen, "1. " + entry_list[0], (50, 250))
+        elif len(entry_list) < 5:
+            for id,entry in enumerate(entry_list[::-1]):
+                draw_text(screen, entry, (50, 250 + 50*id))
+        else:
+            for id,entry in enumerate(entry_list[len(entry_list)-1:len(entry_list)-6:-1]):
+                draw_text(screen, entry, (50, 250 + 50*id))
+
+
+        img_2_b, rect_2_b = draw_text(screen, "Exit view mode", (50, 500))
+        if cursor.colliderect(rect_2_b):
+            pg.draw.rect(screen, (255,255,0), rect_2_b, 1)
 
     #those lines ables us to terminate the program and some other functionality
     for event in pg.event.get():
@@ -33,9 +50,10 @@ while run:
                     if len(text) > 0:
                         text = text[:-1]
                 elif event.key == 13:
-                    entry_list.append(text)
-                    text = "Enter your text here"
-                    run_a = False
+                    if len(text) > 0:
+                        entry_list.append(text)
+                        text = "Click here to start writing or to delete changes"
+                        run_a = False
                 else:
                     text += event.unicode
 
@@ -47,8 +65,16 @@ while run:
             if run_a:
                 if cursor.colliderect(rect5):
                     run_a = False
-            if cursor.colliderect(rect1):
+                if cursor.colliderect(rect4):
+                    text = ""
+            if run_b:
+                if cursor.colliderect(rect_2_b):
+                    run_b = False
+
+            if cursor.colliderect(rect1) and run_b == False:
                 run_a = True
+            if cursor.colliderect(rect2) and run_a == False:
+                run_b = True
                 
         
     if cursor.colliderect(rect3):

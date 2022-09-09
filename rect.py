@@ -8,6 +8,7 @@ FPS = 60
 size = width, height = 900, 600
 run = True
 run_a = False
+run_b = False
 COLOR = (0,255,0)
 
 screen = pg.display.set_mode(size)
@@ -26,7 +27,7 @@ def draw_text(screen, text: str, position: tuple = (0, 0)) -> None:
 
 #some variables
 Menu= ["Select option: ", "a) Add new entry", "b) View entrys", "c) Exit Dairy", "d) Show menu", "Your selection: "]
-text = "Enter your text here"
+text = "Click here to start writing or to delete changes"
 entry_list = []
 
 
