@@ -1,102 +1,213 @@
-from rect import *
-from database import *
+import pygame as pg
 
-pg.init()
+width, height = 900, 600
 
-x,y = -100, -100
-while run:
-    clock.tick(FPS)
+class Text:
+    def __init__(self, text, pos, **options) -> None:
+        self.text = text
+        self.pos = pos
 
-    cursor = pg.Rect(x, y, 10, 10)
-    screen.fill(background) #this isn so important to refresh screen
+        self.fontname = None
+        self.fontsize = 72
+        self.fontcolor = (255,255,255)
+        self.set_font()
+        self.render()
+
+    def set_font(self) -> None:
+        self.font = pg.font.Font(self.fontname, self.fontsize)
+
+    def render(self) -> None:
+        self.img = self.font.render(self.text, True, self.fontcolor)
+        self.rect = self.img.get_rect()
+        self.rect.topleft = self.pos
     
-    img0, rect0 = draw_text(screen, Menu[0])
-    img1, rect1 = draw_text(screen, Menu[1], (50, 51))
-    img2, rect2 = draw_text(screen, Menu[2], (50, 101))
-    img3, rect3 = draw_text(screen, Menu[3], (50, 151))
+    def draw(self):
+        App.screen.blit(self.img, self.rect)
 
-    if run_a:
-        img4, rect4 = draw_text(screen, text, (0, 200))
-        img5, rect5 = draw_text(screen, "Exit or press Enter to save", (50, 500))
-        if cursor.colliderect(rect5):
-            pg.draw.rect(screen, (255,255,0), rect5, 1)
-    if run_b:
-        img_1_b = draw_text(screen, "Yours previous entries", (0, 200))
-        if len(entry_list) < 1:
-            draw_text(screen, "No entries", (50, 250))
-            print(view_entries())
-        elif len(entry_list) < 2:
-            draw_text(screen, "1. " + entry_list[0], (50, 250))
-            print(view_entries())
-        elif len(entry_list) < 5:
-            for id,entry in enumerate(entry_list[::-1]):
-                draw_text(screen, entry + view_entries()[id]["date"], (50, 250 + 50*id))
-                print(view_entries())
+class Cursor:
+    def __init__(self, color = (255,0,0)) -> None:
+        self.x = -10
+        self.y = -10
+        self.color = color
+
+    def show(self, Screen) -> None:
+        pg.draw.rect(Screen, self.color, self.cursor, 1)
+
+    def update(self):
+        self.cursor = pg.Rect(self.x, self.y, 10, 10)
+
+class Scene_Main:
+    def __init__(self) -> None:
+        self.run = True
+        self.title = Text(text="My Dairy", pos=(400,0))
+        self.option_a = Text(text="a) Add new entry", pos=(100,100))
+        self.option_b = Text(text="b) View entrys", pos=(100,200))
+        self.option_c = Text(text="c) Exit Dairy", pos=(100,300))
+        self.option_a_run = False
+        self.option_b_run = False
+        self.option_c_run = False
+
+    def show(self) -> None:
+        self.title.draw()
+        self.option_a.draw()
+        self.option_b.draw()
+        self.option_c.draw()
+
+    def highlight(self, cursor):
+        if cursor.cursor.colliderect(self.option_a.rect):
+            pg.draw.rect(App.screen, (255,255,0), self.option_a.rect, 1)
+            self.option_a_run = True
         else:
-            for id,entry in enumerate(entry_list[len(entry_list)-1:len(entry_list)-6:-1]):
-                draw_text(screen, entry + view_entries()[id]["date"], (50, 250 + 50*id))
-                print(view_entries(), len(view_entries()))
+            self.option_a_run = False
+        if cursor.cursor.colliderect(self.option_b.rect):
+            pg.draw.rect(App.screen, (255,255,0), self.option_b.rect, 1)
+            self.option_b_run = True
+        else:
+            self.option_b_run = False
+        if cursor.cursor.colliderect(self.option_c.rect):
+            pg.draw.rect(App.screen, (255,255,0), self.option_c.rect, 1)
+            self.option_c_run = True
+        else:
+            self.option_c_run = False
 
 
-        img_2_b, rect_2_b = draw_text(screen, "Exit view mode", (50, 500))
-        if cursor.colliderect(rect_2_b):
-            pg.draw.rect(screen, (255,255,0), rect_2_b, 1)
 
-    #those lines ables us to terminate the program and some other functionality
-    for event in pg.event.get():
-        print(event) #right now i need this to track all events
-        if event.type == pg.QUIT:   
-            run = False
-        if event.type == pg.KEYDOWN:
-            if event.key == pg.K_ESCAPE:
-                run = False
-            if event.key == pg.K_a and run_b == False:
-                run_a = True
-            if run_a:
-                if event.key == pg.K_BACKSPACE: 
-                    if len(text) > 0:
-                        text = text[:-1]
-                elif event.key == 13: #Enter
-                    if len(text) > 0:
-                        entry_list.append(text)
-                        add_entries(text)
-                        text = "Click here to start writing or to delete changes"
-                        run_a = False
-                else:
-                    text += event.unicode
+class Scene_A:
+    def __init__(self) -> None:
+        self.run = False
+        self.exit_run = False
+        self.title = Text(text="You can start typing your Entry:", pos=(100, 10))
+        self.exit = Text(text="Back", pos=(700,500))
 
-        if event.type == pg.MOUSEMOTION:
-            x, y = event.pos
-        if event.type == pg.MOUSEBUTTONDOWN:
-            if cursor.colliderect(rect3):
-                run = False
-            if run_a:
-                if cursor.colliderect(rect5):
-                    run_a = False
-                if cursor.colliderect(rect4):
-                    text = ""
-            if run_b:
-                if cursor.colliderect(rect_2_b):
-                    run_b = False
+    def show(self) -> None:
+        self.title.draw()
+        self.exit.draw()
 
-            if cursor.colliderect(rect1) and run_b == False:
-                run_a = True
-            if cursor.colliderect(rect2) and run_a == False:
-                run_b = True
-                
-        
-    if cursor.colliderect(rect3):
-        pg.draw.rect(screen, (255,255,0), rect3, 1)
-    elif cursor.colliderect(rect2):
-        pg.draw.rect(screen, (255,255,0), rect2, 1)
-    elif cursor.colliderect(rect1):
-        pg.draw.rect(screen, (255,255,0), rect1, 1)
+    def highlight(self, cursor):
+        if cursor.cursor.colliderect(self.exit.rect):
+            pg.draw.rect(App.screen, (255,255,0), self.exit.rect, 1)
+            self.exit_run = True
 
-    #uncomment if you want to see a cursor rect position position
-    #pg.draw.rect(screen, (255,0,0), cursor, 1) 
+#this class repesents the scene for view option
+class Scene_B:
+    def __init__(self) -> None:
+        self.run = False
+        self.exit_run = False
+        self.title = Text(text="Your previous Entrys", pos=(100,10))
+        self.exit = Text(text="Back", pos=(700,500))
 
-    pg.display.flip() #how is it diffrent from update?
+    def show(self) -> None:
+        self.title.draw()
+        self.exit.draw()
+
+    def highlight(self, cursor):
+        if cursor.cursor.colliderect(self.exit.rect):
+            pg.draw.rect(App.screen, (255,255,0), self.exit.rect, 1)
+            self.exit_run = True
+
+class Scene_Exit:
+    def __init__(self, width, height) -> None:
+        w, h = 300, 150
+        self.run = False
+        self.exit_run = False
+        self.close_app_run = False
+        self.window = pg.Rect(int(width/2-w/2), int(height/2-h/2), w, h)
+        self.exit = Text(text="No", pos=self.window.bottomright)
+        self.exit.rect.bottomright = self.window.bottomright
+        self.close_app = Text(text="Yes", pos=self.window.bottomleft)
+        self.close_app.rect.bottomleft = self.window.bottomleft
+        self.title = Text(text="Are you sure?", pos=self.window.midtop)
+        self.title.rect.midbottom = self.window.midtop
+        #self.window.width = self.title.rect.width
+        #self.window.height = self.title.rect.height
+
+    def show(self, screen):
+        pg.draw.rect(screen,(255,255,255),self.window,1)
+        self.title.draw()
+        self.exit.draw()
+        self.close_app.draw()
+
+    def highlight(self, cursor):
+        if cursor.cursor.colliderect(self.exit.rect):
+            pg.draw.rect(App.screen, (255,255,0), self.exit.rect, 1)
+            self.exit_run = True
+            self.close_app_run = False
+        if cursor.cursor.colliderect(self.close_app.rect):
+            pg.draw.rect(App.screen, (255,255,0), self.close_app.rect, 1)
+            self.close_app_run = True
+
+class App:
+    def __init__(self, width: int = 640, height: int = 240) -> None:
+        pg.init()
+        App.width = width
+        App.height = height
+        App.running = True
+        flags = pg.RESIZABLE
+        App.screen = pg.display.set_mode((width, height), flags)
+
+        #initialize Other Classes class
+        App.cursor = Cursor()
+        App.main_scene = Scene_Main()
+        App.scene_a = Scene_A()
+        App.scene_b = Scene_B()
+        App.scene_exit = Scene_Exit(width, height)
+
+    def run(self):
+        while App.running:
+            for event in pg.event.get():
+                print(event)
+                if event.type == pg.QUIT:
+                    App.running = False
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE:
+                        App.running = False
+                if event.type == pg.MOUSEMOTION:
+                    App.cursor.x, App.cursor.y = event.pos
+                if event.type == pg.MOUSEBUTTONDOWN:
+                    if App.main_scene.option_a_run:
+                        App.main_scene.run = False
+                        App.scene_a.run = True
+                    if App.scene_a.exit_run:
+                        App.scene_a.exit_run = False
+                        App.scene_a.run = False
+                        App.main_scene.run = True
+                    if App.main_scene.option_b_run:
+                        App.main_scene.run = False
+                        App.scene_b.run = True
+                    if App.scene_b.exit_run:
+                        App.scene_b.exit_run = False
+                        App.scene_b.run = False
+                        App.main_scene.run = True
+                    if App.main_scene.option_c_run:
+                        App.main_scene.run = False
+                        App.scene_exit.run = True
+                    if App.scene_exit.exit_run:
+                        App.scene_exit.exit_run = False
+                        App.scene_exit.run = False
+                        App.main_scene.run = True
+                    if App.scene_exit.close_app_run:
+                        App.running = False
+                        
+            App.screen.fill((0,0,0))
+            App.cursor.update()
+            if App.main_scene.run:
+                App.main_scene.show()
+                App.main_scene.highlight(App.cursor)
+            elif App.scene_a.run:
+                App.scene_a.show()
+                App.scene_a.highlight(App.cursor)
+            elif App.scene_b.run:
+                App.scene_b.show()
+                App.scene_b.highlight(App.cursor)
+            elif App.scene_exit.run:
+                App.scene_exit.show(App.screen)
+                App.scene_exit.highlight(App.cursor)
+
+            App.cursor.show(App.screen)
+            pg.display.flip() #if you are going to test it you may find
+            #quit suprising what You see. To prevent it uncomment this method, but before ypu see it :)
+        pg.quit()
 
 
-pg.quit()
-
+if __name__ == "__main__":
+    App(width, height).run()
