@@ -1,4 +1,5 @@
 import pygame as pg
+from database import *
 
 width, height = 900, 600
 
@@ -78,15 +79,33 @@ class Scene_A:
         self.exit_run = False
         self.title = Text(text="You can start typing your Entry:", pos=(100, 10))
         self.exit = Text(text="Back", pos=(700,500))
+        self.container = pg.Rect(100, 100, 700, 50)
+        self.text = ""
+        self.letters = Text(text=self.text, pos=self.container.topleft)
+        
 
-    def show(self) -> None:
+    def show(self, screen) -> None:
+        pg.draw.rect(screen, (255,0,255), self.container, 1)
         self.title.draw()
         self.exit.draw()
+        self.letters.draw()
+        
 
     def highlight(self, cursor):
         if cursor.cursor.colliderect(self.exit.rect):
             pg.draw.rect(App.screen, (255,255,0), self.exit.rect, 1)
             self.exit_run = True
+
+    def write(self, event):
+        if event.key == pg.K_BACKSPACE:
+            if len(self.text) > 0:
+                self.text = self.text[:-1]
+                self.letters = Text(text=self.text, pos=self.container.topleft) 
+        else:
+            self.text += event.unicode
+            self.letters = Text(text=self.text, pos=self.container.topleft)
+        
+        
 
 #this class repesents the scene for view option
 class Scene_B:
@@ -155,12 +174,14 @@ class App:
     def run(self):
         while App.running:
             for event in pg.event.get():
-                print(event)
+                #print(event)
                 if event.type == pg.QUIT:
                     App.running = False
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:
                         App.running = False
+                    if App.scene_a.run:
+                        App.scene_a.write(event)
                 if event.type == pg.MOUSEMOTION:
                     App.cursor.x, App.cursor.y = event.pos
                 if event.type == pg.MOUSEBUTTONDOWN:
@@ -194,7 +215,7 @@ class App:
                 App.main_scene.show()
                 App.main_scene.highlight(App.cursor)
             elif App.scene_a.run:
-                App.scene_a.show()
+                App.scene_a.show(App.screen)
                 App.scene_a.highlight(App.cursor)
             elif App.scene_b.run:
                 App.scene_b.show()
