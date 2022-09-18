@@ -11,4 +11,5 @@ def view_entries():
     return entries
 
 
-print(datetime.datetime.now())
+
+#print(datetime.datetime.now())
