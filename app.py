@@ -1,15 +1,13 @@
 import pygame as pg
 from database import *
 
-width, height = 900, 600
-
 class Text:
-    def __init__(self, text, pos, **options) -> None:
+    def __init__(self, text, pos, fontsize=72, **options) -> None:
         self.text = text
         self.pos = pos
 
         self.fontname = None
-        self.fontsize = 72
+        self.fontsize = fontsize
         self.fontcolor = (255,255,255)
         self.set_font()
         self.render()
@@ -77,7 +75,7 @@ class Scene_A:
     def __init__(self) -> None:
         self.run = False
         self.exit_run = False
-        self.title = Text(text="You can start typing your Entry:", pos=(100, 10))
+        self.title = Text(text="Type text, than press ENTER:", pos=(100, 10))
         self.exit = Text(text="Back", pos=(700,500))
         self.container = pg.Rect(100, 100, 700, 50)
         self.text = ""
@@ -100,10 +98,15 @@ class Scene_A:
         if event.key == pg.K_BACKSPACE:
             if len(self.text) > 0:
                 self.text = self.text[:-1]
-                self.letters = Text(text=self.text, pos=self.container.topleft) 
+                self.letters = Text(text=self.text, pos=self.container.topleft, fontsize=36)
+        elif event.key == 13: #stands for ENTER key
+            if len(self.text) > 0:
+                add_entries(self.text)
+                self.text = ""
+                self.letters = Text(text=self.text, pos=self.container.topleft, fontsize=36)
         else:
             self.text += event.unicode
-            self.letters = Text(text=self.text, pos=self.container.topleft)
+            self.letters = Text(text=self.text, pos=self.container.topleft, fontsize=36)
         
         
 
@@ -112,7 +115,7 @@ class Scene_B:
     def __init__(self) -> None:
         self.run = False
         self.exit_run = False
-        self.title = Text(text="Your previous Entrys", pos=(100,10))
+        self.title = Text(text="Your latest Entrys", pos=(100,10))
         self.exit = Text(text="Back", pos=(700,500))
 
     def show(self) -> None:
@@ -123,6 +126,11 @@ class Scene_B:
         if cursor.cursor.colliderect(self.exit.rect):
             pg.draw.rect(App.screen, (255,255,0), self.exit.rect, 1)
             self.exit_run = True
+
+    def show_entries(self, data_entries):    
+        for i,entry in enumerate(data_entries[::-1]):
+            Text(text=f"{entry['date'][0:10]} : {entry['content']}", pos=(0,30*(i+2)), fontsize=36).draw()
+            
 
 class Scene_Exit:
     def __init__(self, width, height) -> None:
@@ -220,6 +228,8 @@ class App:
             elif App.scene_b.run:
                 App.scene_b.show()
                 App.scene_b.highlight(App.cursor)
+                #print(entries)
+                App.scene_b.show_entries(entries)
             elif App.scene_exit.run:
                 App.scene_exit.show(App.screen)
                 App.scene_exit.highlight(App.cursor)
@@ -229,6 +239,6 @@ class App:
             #quit suprising what You see. To prevent it uncomment this method, but before ypu see it :)
         pg.quit()
 
-
+width, height = 900, 600
 if __name__ == "__main__":
     App(width, height).run()
