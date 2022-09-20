@@ -242,8 +242,15 @@ class App:
         pg.quit()
 
 def main(width=900, height=600):
+    
+    #we connect the databse or creating it if we start program for the first time
+    my_dairy_databse = DataBase("MyDairy")
+    my_dairy_databse.create_table("entries", {"date_time": "TEXT", "content": "TEXT"})
+
     App(width, height).run()
+
     my_dairy_databse.close()
+    #and we close it on the last line
 
 if __name__ == "__main__":
     main()
