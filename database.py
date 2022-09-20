@@ -45,9 +45,4 @@ class DataBase:
         self.connection.close()
 
 
-#we connect the databse or creating it if we start program for the first time
-#and in the app.py file we close it on the last line
-my_dairy_databse = DataBase("MyDairy")
-my_dairy_databse.create_table("entries", {"date_time": "TEXT", "content": "TEXT"})
-
 
