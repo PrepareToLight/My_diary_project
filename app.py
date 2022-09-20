@@ -102,6 +102,7 @@ class Scene_A:
         elif event.key == 13: #stands for ENTER key
             if len(self.text) > 0:
                 add_entries(self.text)
+                my_dairy_databse.input_to_table(entries[-1]["date"][:-7], self.text, table_name="entries")
                 self.text = ""
                 self.letters = Text(text=self.text, pos=self.container.topleft, fontsize=36)
         else:
@@ -179,6 +180,7 @@ class App:
         App.scene_b = Scene_B()
         App.scene_exit = Scene_Exit(width, height)
 
+
     def run(self):
         while App.running:
             for event in pg.event.get():
@@ -236,9 +238,12 @@ class App:
 
             App.cursor.show(App.screen)
             pg.display.flip() #if you are going to test it you may find
-            #quit suprising what You see. To prevent it uncomment this method, but before ypu see it :)
+            #qait suprising what You see. To prevent it uncomment this method, but before ypu see it :)
         pg.quit()
 
-width, height = 900, 600
-if __name__ == "__main__":
+def main(width=900, height=600):
     App(width, height).run()
+    my_dairy_databse.close()
+
+if __name__ == "__main__":
+    main()
